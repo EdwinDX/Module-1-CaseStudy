@@ -20,16 +20,14 @@ class Bullet {
         c.arc(this.x,this.y,this.radius,0,Math.PI*2,false);
         c.fillStyle = this.color;
         c.fill();
+        c.closePath();
     }
-    update() {;
+    update() {
         this.x += this.velocity.x;
         this.y += this.velocity.y;
     }
-    isTouching() {
-
-    }
-    setAngle(event) {
-        this.angle = Math.atan2(event.clientY - DEFAULT_PLAYER_Y,event.clientX - DEFAULT_PLAYER_X);
+    setAngle(x,y) {
+        this.angle = Math.atan2(y - player.y,x - player.x);
     }
     setVelocity() {
         this.velocity = { x:Math.cos(this.angle)*5,y:Math.sin(this.angle)*5};

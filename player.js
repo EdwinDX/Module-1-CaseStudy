@@ -7,7 +7,10 @@ class Players {
     shootingStatus;
     velocity;
     level_speed;
-    constructor(x, y, radius, color, status, shootingStatus,velocity,level_speed) {
+    speed;
+    weapon_level;
+    shield;
+    constructor(x, y, radius, color, status, shootingStatus,velocity,level_speed,speed,weapon_level,shield) {
         this.x = x;
         this.y = y;
         this.radius = radius;
@@ -16,24 +19,37 @@ class Players {
         this.shootingStatus = shootingStatus;
         this.velocity = velocity;
         this.level_speed = level_speed;
+        this.speed = speed;
+        this.weapon_level = weapon_level;
+        this.shield = shield;
+        document.addEventListener('keydown', this.keyDown);
+        document.addEventListener('keyup', this.keyUp);
     }
-    isShooting() {
-
+    upgradeWeapon() {
+        this.weapon_level++;
     }
-    isSurvive() {
-
+    downgradeWeapon() {
+        this.weapon_level--;
+    }
+    increateShield() {
+        this.shield++;
+    }
+    decreateShield() {
+        this.shield--;
     }
     draw() {
         c.beginPath();
         c.arc(this.x,this.y,this.radius,0,Math.PI*2,false);
         c.fillStyle = this.color;
         c.fill();
+
+        c.closePath();
     }
     setVelocity() {
         this.velocity = { x:Math.cos(this.angle)*2,y:Math.sin(this.angle)*2};
     }
     setRandomRadius() {
-        this.radius = Math.random() * (30-5) + 5;
+        this.radius = Math.random() * (50-5) + 5;
     }
     setRandomSpawn() {
         if (Math.random() < 0.5) {
@@ -49,10 +65,64 @@ class Players {
         this.color = `hsl(${Math.random() * 360},50%,50%)`;
     }
     setAngle() {
-        this.angle = Math.atan2( DEFAULT_PLAYER_Y - this.y, DEFAULT_PLAYER_X - this.x);
+        this.angle = Math.atan2( player.y - this.y, player.x - this.x);
     }
     update() {
         this.x += this.velocity.x/3 * this.level_speed;
         this.y += this.velocity.y/3 * this.level_speed;
     }
+    keyDown = (event) => {
+        if (event.code === 'ArrowUp') {
+            this.upPressed = true;
+        }
+        if (event.code === 'ArrowDown') {
+            this.downPressed = true;
+        }
+        if (event.code === 'ArrowRight') {
+            this.rightPressed = true;
+        }
+        if (event.code === 'ArrowLeft') {
+            this.leftPressed = true;
+        }
+    }
+    keyUp = (event) => {
+        if (event.code === 'ArrowUp') {
+            this.upPressed = false;
+        }
+        if (event.code === 'ArrowDown') {
+            this.downPressed = false;
+        }
+        if (event.code === 'ArrowRight') {
+            this.rightPressed = false;
+        }
+        if (event.code === 'ArrowLeft') {
+            this.leftPressed = false;
+        }
+    }
+    move() {
+        if (this.upPressed) {
+            this.y -= this.speed;
+        }
+        if (this.downPressed) {
+            this.y += this.speed;
+        }
+        if (this.rightPressed) {
+            this.x += this.speed;
+        }
+        if (this.leftPressed) {
+            this.x -= this.speed;
+        }
+    }
+    // moveRight() {
+    //     this.x += this.speed;
+    // }
+    // moveLeft() {
+    //     this.x -= this.speed;
+    // }
+    // moveUp() {
+    //     this.y -= this.speed;
+    // }
+    // moveDown() {
+    //     this.y += this.speed;
+    // }
 }

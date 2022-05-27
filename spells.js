@@ -17,19 +17,19 @@ class Spells {
         if (Math.random()<0.5) {
             this.x = Math.random()*canvas.width;
             if (Math.random()<0.5) {
-                this.y = 0;
+                this.y = 10 ;
             }
             else {
-                this.y = canvas.height;
+                this.y = canvas.height - 10;
             }
         }
         else {
             this.y = Math.random()*canvas.height;
             if (Math.random()<0.5) {
-                this.x = 0;
+                this.x = 10 ;
             }
             else {
-                this.x = canvas.width;
+                this.x = canvas.width - 10;
             }
         }
     }

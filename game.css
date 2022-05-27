@@ -1,0 +1,52 @@
+/*#container {*/
+/*    width: 1024px;*/
+/*    height: 576px;*/
+/*    margin: 0 auto;*/
+/*    position: relative;*/
+/*}*/
+
+/*canvas {*/
+/*    position: absolute;*/
+/*    top: 0;*/
+/*    left: 0;*/
+/*}*/
+
+/*#myCanvas {z-index: 0;}*/
+/*#canvas1 {z-index: 1;}*/
+/*#canvas2 {z-index: 2;}*/
+/*#canvas3 {z-index: 3;}*/
+
+/*#menu {*/
+/*    position: relative;*/
+/*    width: 250px;*/
+/*    height: 200px;*/
+/*    z-index: 4;*/
+/*    top: 200px;*/
+/*    left: 275px;*/
+/*}*/
+/*#board {*/
+/*    color: aqua;*/
+/*}*/
+
+/*button {*/
+/*    width: 200px;*/
+/*    height: 50px;*/
+/*    font-size: 20px;*/
+/*    position: absolute;*/
+/*    z-index: 5;*/
+/*    color: aliceblue;*/
+/*}*/
+
+/*#button1 {*/
+/*    left: 25px;*/
+/*}*/
+
+/*#button2 {*/
+/*    left: 25px;*/
+/*    top: 75px;*/
+/*}*/
+
+/*#button3 {*/
+/*    left: 25px;*/
+/*    top: 150px;*/
+/*}*/

@@ -1,7 +1,7 @@
 let canvas = document.getElementById('myCanvas');
 let c = canvas.getContext('2d');
-canvas.width = 1024;
-canvas.height = 576;
+canvas.width = innerWidth-50;
+canvas.height = innerHeight-50;
 const SCREEN_X = canvas.width;
 const SCREEN_Y = canvas.height;
 const DEFAULT_PLAYER_X = canvas.width/2;
@@ -106,7 +106,7 @@ function animate() {
         enemy.draw();
         enemy.update();
         let distanceToPlayer = Math.hypot(player.x - enemy.x, player.y - enemy.y);
-        if (distanceToPlayer - player.radius - enemy.radius < 1) {
+        if (distanceToPlayer - player.radius - enemy.radius < 0) {
             explosion.play();
             enemies.splice(index,1);
             player.decreateShield();
@@ -118,11 +118,12 @@ function animate() {
                 cancelAnimationFrame(animateId);
                 endGame.play();
 
+
             }
         }
         bullets.forEach((bullet, bulletIndex) => {
             let distanceToEnemy = Math.hypot(bullet.x - enemy.x, bullet.y - enemy.y);
-            if (distanceToEnemy - bullet.radius - enemy.radius < 1) {
+            if (distanceToEnemy - bullet.radius - enemy.radius < 0) {
                 for(let i = 0; i < enemy.radius * 2; i++){
                     fragments.push( new Fragments(bullet.x, bullet.y, Math.random()*2, enemy.color, {x: (Math.random() - 0.5) * (Math.random() * 10), y: (Math.random() - 0.5) * (Math.random() * 10)}))
                 }
@@ -150,7 +151,7 @@ function animate() {
         spell.draw();
         bullets.forEach((bullet, bulletIndex) => {
             let distanceToSpellBox = Math.hypot(bullet.x - spell.x, bullet.y - spell.y);
-            if (distanceToSpellBox - bullet.radius - spell.radius < 1) {
+            if (distanceToSpellBox - bullet.radius - spell.radius < 0) {
                 spell.setSpell(spell.type);
                     setTimeout(() => {
                         bullets.splice(bulletIndex,1);
@@ -163,7 +164,6 @@ function animate() {
     document.getElementById('spell').innerHTML = player.weapon_level;
     document.getElementById('score').innerHTML = score;
     document.getElementById('shield').innerHTML = player.shield;
-
 }
 function createEnemy() {
     setInterval(() => {

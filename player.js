@@ -3,20 +3,17 @@ class Players {
     y;
     radius;
     color;
-    status;
-    shootingStatus;
     velocity;
     level_speed;
     speed;
     weapon_level;
     shield;
-    constructor(x, y, radius, color, status, shootingStatus,velocity,level_speed,speed,weapon_level,shield) {
+
+    constructor(x, y, radius, color, velocity, level_speed, speed, weapon_level, shield) {
         this.x = x;
         this.y = y;
         this.radius = radius;
         this.color = color;
-        this.status = status;
-        this.shootingStatus = shootingStatus;
         this.velocity = velocity;
         this.level_speed = level_speed;
         this.speed = speed;
@@ -25,27 +22,33 @@ class Players {
         document.addEventListener('keydown', this.keyDown);
         document.addEventListener('keyup', this.keyUp);
     }
+
     upgradeWeapon() {
         this.weapon_level++;
     }
+
     downgradeWeapon() {
         this.weapon_level--;
     }
+
     increateShield() {
         this.shield++;
     }
+
     decreateShield() {
         this.shield--;
         console.log(typeof this.shield);
     }
+
     draw() {
         c.beginPath();
-        c.arc(this.x,this.y,this.radius,0,Math.PI*2,false);
+        c.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
         c.fillStyle = this.color;
         c.fill();
 
-        c.closePath();
+
     }
+
     getWeaponLevel() {
         if (this.weapon_level <= 0) {
             return '1 GUN';
@@ -57,35 +60,37 @@ class Players {
             return '3 GUN';
         }
     }
-    getShield() {
-        return this.shield;
-    }
     setVelocity() {
-        this.velocity = { x:Math.cos(this.angle)*2,y:Math.sin(this.angle)*2};
+        this.velocity = {x: Math.cos(this.angle) * 2, y: Math.sin(this.angle) * 2};
     }
+
     setRandomRadius() {
-        this.radius = Math.random() * (50-5) + 5;
+        this.radius = Math.random() * (30 - 5) + 5;
     }
+
     setRandomSpawn() {
         if (Math.random() < 0.5) {
             this.x = Math.random() < 0.5 ? 0 - this.radius : SCREEN_X - this.radius;
             this.y = Math.random() * SCREEN_Y;
-        }
-        else {
+        } else {
             this.x = Math.random() * SCREEN_X;
             this.y = Math.random() < 0.5 ? 0 - this.radius : SCREEN_Y - this.radius;
         }
     }
+
     setRandomColor() {
         this.color = `hsl(${Math.random() * 360},50%,50%)`;
     }
+
     setAngle() {
-        this.angle = Math.atan2( player.y - this.y, player.x - this.x);
+        this.angle = Math.atan2(player.y - this.y, player.x - this.x);
     }
+
     update() {
-        this.x += this.velocity.x/3 * this.level_speed;
-        this.y += this.velocity.y/3 * this.level_speed;
+        this.x += this.velocity.x / 2 * this.level_speed;
+        this.y += this.velocity.y / 2 * this.level_speed;
     }
+
     keyDown = (event) => {
         if (event.code === 'ArrowUp') {
             this.upPressed = true;
@@ -114,6 +119,7 @@ class Players {
             this.leftPressed = false;
         }
     }
+
     move() {
         if (this.upPressed) {
             this.y -= this.speed;
@@ -130,3 +136,35 @@ class Players {
     }
 
 }
+window.addEventListener('click', event => {
+    let x = event.clientX;
+    let y = event.clientY;
+    if (player.weapon_level <= 0) {
+        lvl0_shot.play();
+        bullet_Sample.color = 'white';
+        bullet_Sample.setAngle(x, y);
+        bullet_Sample.setVelocity();
+        bullets.push(new Bullet(player.x, player.y, 5, bullet_Sample.color, bullet_Sample.velocity, bullet_Sample.angle));
+    } else if (player.weapon_level === 1) {
+        lvl1_shot.play();
+        bullet_Sample.color = 'red';
+        bullet_Sample.setAngle(x, y - 20);
+        bullet_Sample.setVelocity();
+        bullets.push(new Bullet(player.x, player.y, 5, bullet_Sample.color, bullet_Sample.velocity, bullet_Sample.angle));
+        bullet_Sample.setAngle(x, y + 20);
+        bullet_Sample.setVelocity();
+        bullets.push(new Bullet(player.x, player.y, 5, bullet_Sample.color, bullet_Sample.velocity, bullet_Sample.angle));
+    } else {
+        lvl2_shot.play();
+        bullet_Sample.color = 'green';
+        bullet_Sample.setAngle(x, y);
+        bullet_Sample.setVelocity();
+        bullets.push(new Bullet(player.x, player.y, 5, bullet_Sample.color, bullet_Sample.velocity, bullet_Sample.angle));
+        bullet_Sample.setAngle(x, y - 20);
+        bullet_Sample.setVelocity();
+        bullets.push(new Bullet(player.x, player.y, 5, bullet_Sample.color, bullet_Sample.velocity, bullet_Sample.angle));
+        bullet_Sample.setAngle(x, y + 20);
+        bullet_Sample.setVelocity();
+        bullets.push(new Bullet(player.x, player.y, 5, bullet_Sample.color, bullet_Sample.velocity, bullet_Sample.angle));
+    }
+});

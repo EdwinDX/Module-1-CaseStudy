@@ -4,14 +4,12 @@ class Spells {
     radius;
     type;
     color;
-    status;
-    constructor(x, y, radius, type, color, status) {
+    constructor(x, y, radius, type, color) {
         this.x = x;
         this.y = y;
         this.radius = radius;
         this.type = type;
         this.color = color;
-        this.status = status;
     }
     setRandomRespawn() {
         if (Math.random()<0.5) {
@@ -69,6 +67,6 @@ class Spells {
         c.arc(this.x,this.y,this.radius,0,Math.PI*2,false);
         c.fillStyle = this.color;
         c.fill();
-        c.closePath();
+
     }
 }

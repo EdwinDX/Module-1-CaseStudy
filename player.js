@@ -36,6 +36,7 @@ class Players {
     }
     decreateShield() {
         this.shield--;
+        console.log(typeof this.shield);
     }
     draw() {
         c.beginPath();
@@ -44,6 +45,20 @@ class Players {
         c.fill();
 
         c.closePath();
+    }
+    getWeaponLevel() {
+        if (this.weapon_level <= 0) {
+            return '1 GUN';
+        }
+        if (this.weapon_level === 1) {
+            return '2 GUN';
+        }
+        if (this.weapon_level > 1) {
+            return '3 GUN';
+        }
+    }
+    getShield() {
+        return this.shield;
     }
     setVelocity() {
         this.velocity = { x:Math.cos(this.angle)*2,y:Math.sin(this.angle)*2};
@@ -113,16 +128,5 @@ class Players {
             this.x -= this.speed;
         }
     }
-    // moveRight() {
-    //     this.x += this.speed;
-    // }
-    // moveLeft() {
-    //     this.x -= this.speed;
-    // }
-    // moveUp() {
-    //     this.y -= this.speed;
-    // }
-    // moveDown() {
-    //     this.y += this.speed;
-    // }
+
 }

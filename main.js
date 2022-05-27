@@ -1,9 +1,12 @@
+//Canvas
 let canvas = document.getElementById('myCanvas');
 let c = canvas.getContext('2d');
+//Lấy chiều dài rộng màn hình
 canvas.width = innerWidth-50;
 canvas.height = innerHeight-50;
 const SCREEN_X = canvas.width;
 const SCREEN_Y = canvas.height;
+//Vị trí ban đầu player ở trung tâm, độ lớn, màu, tốc độ chạy
 const DEFAULT_PLAYER_X = canvas.width/2;
 const DEFAULT_PLAYER_Y = canvas.height/2;
 const DEFAULT_PLAYER_RADIUS = 10;
@@ -13,19 +16,28 @@ let animateId;
 let scores = [];
 let score = 0;
 let finalScore = 0;
-let player = new Players(DEFAULT_PLAYER_X,DEFAULT_PLAYER_Y,DEFAULT_PLAYER_RADIUS,DEFAULT_PLAYER_COLOR,true,false,null,null,DEFAULT_PLAYER_SPEED,1,1);
-let bullet_Sample = new Bullet();
+let player = new Players(DEFAULT_PLAYER_X,DEFAULT_PLAYER_Y,DEFAULT_PLAYER_RADIUS,DEFAULT_PLAYER_COLOR,true,false,null,null,DEFAULT_PLAYER_SPEED,0,1);
+let bullet_Sample = new Bullet(); //tạo đối tượng mẫu
 let enemy_Sample = new Players();
 let spell_Sample = new Spells();
 let bullets = [];
 let enemies = [];
 let spells = [];
 let fragments = [];
-// let img_background = new Image();
+// let img_background = new Image(); //Chèn hình ---> mất hiệu ứng bóng mờ
 // img_background.src = "img/sky.jpg";
 let menu = document.getElementById('menu');
 let board = document.getElementById('board');
+let settingsMenu = document.getElementById('settingsMenu');
+let menuDifficult = document.getElementById('menuDifficult');
+let menuWeapon = document.getElementById('menuWeapon');
+let menuShield = document.getElementById('menuShield');
 board.style.display = 'none';
+settingsMenu.style.display = 'none';
+menuDifficult.style.display = 'none';
+menuWeapon.style.display = 'none';
+menuShield.style.display = 'none';
+//Âm thanh
 let lvl0_shot = new Audio('audio/lvl-0-shot.mp3');
 let lvl1_shot = new Audio('audio/lvl-1-shot.mp3');
 let lvl2_shot = new Audio('audio/lvl-2-shot.mp3');
@@ -35,8 +47,10 @@ let endGame = new Audio('audio/end-game.mp3');
 let endGame2 = new Audio('audio/end-game-2.mp3');
 let upgrade = new Audio('audio/upgrade.mp3');
 let downgrade = new Audio('audio/downgrade.mp3');
+let gameMusic = new Audio('audio/game.mp3');
+
 function reset(){
-    player = new Players(DEFAULT_PLAYER_X,DEFAULT_PLAYER_Y,DEFAULT_PLAYER_RADIUS,DEFAULT_PLAYER_COLOR,true,false,null,null,DEFAULT_PLAYER_SPEED,1,1);
+    player = new Players(DEFAULT_PLAYER_X,DEFAULT_PLAYER_Y,DEFAULT_PLAYER_RADIUS,DEFAULT_PLAYER_COLOR,true,false,null,null,DEFAULT_PLAYER_SPEED,player.weapon_level,this.shield);
     bullet_Sample = new Bullet();
     enemy_Sample = new Players();
     spell_Sample = new Spells();
@@ -51,12 +65,13 @@ function reset(){
 
 function animate() {
     animateId = requestAnimationFrame(animate);
-
+    gameMusic.play();
     // c.drawImage(img_background,0,0,SCREEN_X,SCREEN_Y);
     c.fillStyle = 'rgba(0 , 0, 0, 0.05)';
     c.fillRect(0,0,SCREEN_X,SCREEN_Y);
     player.draw();
     player.move();
+    //Giới hạn vùng chạy player trong Canvas
     if (player.x - player.radius < 0) {
         player.x = player.radius;
     }
@@ -76,7 +91,7 @@ function animate() {
             frags.update();
         }
     })
-
+    //Xóa đạn khi đạn bay ra khỏi Canvas
     bullets.forEach((bullet, index) => {
         bullet.draw();
         bullet.update();
@@ -89,14 +104,23 @@ function animate() {
     enemies.forEach((enemy, index) => {
         enemy.draw();
         enemy.update();
+        //Enemy nảy lại từ viền
+        if (enemy.x+enemy.radius<0 || enemy.x-enemy.radius>canvas.width || enemy.y+enemy.radius<0 || enemy.y-enemy.radius>canvas.height) {
+            let x = enemy.x = 0 - enemy.x;
+            let y = enemy.y = 0 - enemy.y;
+            enemy.setAngle(x,y);
+            enemy.setVelocity();
+        }
+        //Kiểm tra Enemy va vào Player
         let distanceToPlayer = Math.hypot(player.x - enemy.x, player.y - enemy.y);
-        if (distanceToPlayer - player.radius - enemy.radius < 0) {
+        if (distanceToPlayer - player.radius - enemy.radius < 1) {
             explosion.play();
             enemies.splice(index,1);
             player.decreateShield();
             setTimeout(() => {
                 endGame2.play();
             },500);
+            //End Game
             if (player.shield < 0) {
                 player.status = false;
                 cancelAnimationFrame(animateId);
@@ -107,13 +131,16 @@ function animate() {
                 board.style.display = 'none';
             }
         }
+        //Kiểm tra đạn bắn trúng Enemy
         bullets.forEach((bullet, bulletIndex) => {
             let distanceToEnemy = Math.hypot(bullet.x - enemy.x, bullet.y - enemy.y);
-            if (distanceToEnemy - bullet.radius - enemy.radius < 0) {
+            if (distanceToEnemy - bullet.radius - enemy.radius < 1) {
+                //Hiệu ứng vỡ
                 for(let i = 0; i < enemy.radius * 2; i++){
                     fragments.push( new Fragments(bullet.x, bullet.y, Math.random()*2, enemy.color, {x: (Math.random() - 0.5) * (Math.random() * 10), y: (Math.random() - 0.5) * (Math.random() * 10)}))
                 }
                 bullet.status = false;
+                //Enemy bị nhỏ lại nếu quá lớn khi bị bắn trúng
                 if (enemy.radius - 10 > 10) {
                     clash.play();
                     enemy.radius -= 10;
@@ -133,11 +160,12 @@ function animate() {
             }
         })
     });
+    //Skill của player
     spells.forEach((spell, index) => {
         spell.draw();
         bullets.forEach((bullet, bulletIndex) => {
             let distanceToSpellBox = Math.hypot(bullet.x - spell.x, bullet.y - spell.y);
-            if (distanceToSpellBox - bullet.radius - spell.radius < 0) {
+            if (distanceToSpellBox - bullet.radius - spell.radius < 1) {
                 spell.setSpell(spell.type);
                     setTimeout(() => {
                         bullets.splice(bulletIndex,1);
@@ -150,6 +178,7 @@ function animate() {
     document.getElementById('spell').innerHTML = player.weapon_level;
     document.getElementById('score').innerHTML = score;
     document.getElementById('shield').innerHTML = player.shield;
+    console.log(typeof player.shield);
 }
 function createEnemy() {
     setInterval(() => {
@@ -176,36 +205,40 @@ function createSpellBox() {
     },30000);
 }
 function startGame() {
+    gameMusic.play();
     window.addEventListener('click',event => {
         player.shootingStatus = true;
         let x = event.clientX;
         let y = event.clientY;
         if (player.weapon_level <= 0) {
             lvl0_shot.play();
+            bullet_Sample.color = 'white';
             bullet_Sample.setAngle(x,y);
             bullet_Sample.setVelocity();
-            bullets.push(new Bullet(player.x,player.y,5,'white',bullet_Sample.velocity,bullet_Sample.angle,true));
+            bullets.push(new Bullet(player.x,player.y,5,bullet_Sample.color,bullet_Sample.velocity,bullet_Sample.angle,true));
         }
         else if (player.weapon_level===1) {
             lvl1_shot.play();
+            bullet_Sample.color = 'red';
             bullet_Sample.setAngle(x,y-20);
             bullet_Sample.setVelocity();
-            bullets.push(new Bullet(player.x,player.y,5,'red',bullet_Sample.velocity,bullet_Sample.angle,true));
+            bullets.push(new Bullet(player.x,player.y,5,bullet_Sample.color,bullet_Sample.velocity,bullet_Sample.angle,true));
             bullet_Sample.setAngle(x,y+20);
             bullet_Sample.setVelocity();
-            bullets.push(new Bullet(player.x,player.y,5,'red',bullet_Sample.velocity,bullet_Sample.angle,true));
+            bullets.push(new Bullet(player.x,player.y,5,bullet_Sample.color,bullet_Sample.velocity,bullet_Sample.angle,true));
         }
         else {
             lvl2_shot.play();
+            bullet_Sample.color = 'green';
             bullet_Sample.setAngle(x,y);
             bullet_Sample.setVelocity();
-            bullets.push(new Bullet(player.x,player.y,5,'green',bullet_Sample.velocity,bullet_Sample.angle,true));
+            bullets.push(new Bullet(player.x,player.y,5,bullet_Sample.color,bullet_Sample.velocity,bullet_Sample.angle,true));
             bullet_Sample.setAngle(x,y-20);
             bullet_Sample.setVelocity();
-            bullets.push(new Bullet(player.x,player.y,5,'green',bullet_Sample.velocity,bullet_Sample.angle,true));
+            bullets.push(new Bullet(player.x,player.y,5,bullet_Sample.color,bullet_Sample.velocity,bullet_Sample.angle,true));
             bullet_Sample.setAngle(x,y+20);
             bullet_Sample.setVelocity();
-            bullets.push(new Bullet(player.x,player.y,5,'green',bullet_Sample.velocity,bullet_Sample.angle,true));
+            bullets.push(new Bullet(player.x,player.y,5,bullet_Sample.color,bullet_Sample.velocity,bullet_Sample.angle,true));
         }
 
         player.shootingStatus = false;
@@ -216,4 +249,45 @@ function startGame() {
     createSpellBox();
     menu.style.display = 'none';
     board.style.display = 'inline';
+    settingsMenu.style.display = 'none';
+}
+function setGame() {
+    menu.style.display = 'none';
+    board.style.display = 'none';
+    settingsMenu.style.display = 'flex';
+}
+function  backMenu() {
+    menu.style.display = 'flex';
+    board.style.display = 'none';
+    settingsMenu.style.display = 'none';
+}
+function backSettingsMenu () {
+    settingsMenu.style.display = 'flex';
+    menuDifficult.style.display = 'none';
+    menuWeapon.style.display = 'none';
+    menuShield.style.display = 'none';
+}
+function setDifficult() {
+    settingsMenu.style.display = 'none';
+
+    menuDifficult.style.display = 'flex';
+}
+function setWeapon() {
+    settingsMenu.style.display = 'none';
+    document.getElementById('currentGun').innerHTML = player.getWeaponLevel();
+    menuWeapon.style.display = 'flex';
+}
+function setWeaponGun(x) {
+    player.weapon_level = x;
+    document.getElementById('currentGun').innerHTML = player.getWeaponLevel();
+}
+function setShield() {
+    settingsMenu.style.display = 'none';
+    document.getElementById('currentShield').innerHTML = player.shield;
+    menuShield.style.display = 'flex';
+}
+function setShieldNumber(x) {
+    player.shield = player.shield+x;
+    console.log(typeof x);
+    document.getElementById('currentShield').innerHTML = player.shield;
 }

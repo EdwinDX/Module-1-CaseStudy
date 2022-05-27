@@ -10,7 +10,9 @@ const DEFAULT_PLAYER_RADIUS = 10;
 const DEFAULT_PLAYER_COLOR = 'white';
 const DEFAULT_PLAYER_SPEED = 0.8;
 let animateId;
+let scores = [];
 let score = 0;
+let finalScore = 0;
 let player = new Players(DEFAULT_PLAYER_X,DEFAULT_PLAYER_Y,DEFAULT_PLAYER_RADIUS,DEFAULT_PLAYER_COLOR,true,false,null,null,DEFAULT_PLAYER_SPEED,1,1);
 let bullet_Sample = new Bullet();
 let enemy_Sample = new Players();
@@ -19,8 +21,11 @@ let bullets = [];
 let enemies = [];
 let spells = [];
 let fragments = [];
-let img_background = new Image();
-img_background.src = "img/sky.jpg";
+// let img_background = new Image();
+// img_background.src = "img/sky.jpg";
+let menu = document.getElementById('menu');
+let board = document.getElementById('board');
+board.style.display = 'none';
 let lvl0_shot = new Audio('audio/lvl-0-shot.mp3');
 let lvl1_shot = new Audio('audio/lvl-1-shot.mp3');
 let lvl2_shot = new Audio('audio/lvl-2-shot.mp3');
@@ -30,41 +35,20 @@ let endGame = new Audio('audio/end-game.mp3');
 let endGame2 = new Audio('audio/end-game-2.mp3');
 let upgrade = new Audio('audio/upgrade.mp3');
 let downgrade = new Audio('audio/downgrade.mp3');
+function reset(){
+    player = new Players(DEFAULT_PLAYER_X,DEFAULT_PLAYER_Y,DEFAULT_PLAYER_RADIUS,DEFAULT_PLAYER_COLOR,true,false,null,null,DEFAULT_PLAYER_SPEED,1,1);
+    bullet_Sample = new Bullet();
+    enemy_Sample = new Players();
+    spell_Sample = new Spells();
+    score = 0;
+    scores.push(score);
+    finalScore = 0;
+    bullets = [];
+    enemies = [];
+    spells = [];
+    fragments = [];
+}
 
-window.addEventListener('click',event => {
-    player.shootingStatus = true;
-    let x = event.clientX;
-    let y = event.clientY;
-    if (player.weapon_level <= 0) {
-        lvl0_shot.play();
-        bullet_Sample.setAngle(x,y);
-        bullet_Sample.setVelocity();
-        bullets.push(new Bullet(player.x,player.y,5,'white',bullet_Sample.velocity,bullet_Sample.angle,true));
-    }
-    else if (player.weapon_level===1) {
-        lvl1_shot.play();
-        bullet_Sample.setAngle(x,y-20);
-        bullet_Sample.setVelocity();
-        bullets.push(new Bullet(player.x,player.y,5,'red',bullet_Sample.velocity,bullet_Sample.angle,true));
-        bullet_Sample.setAngle(x,y+20);
-        bullet_Sample.setVelocity();
-        bullets.push(new Bullet(player.x,player.y,5,'red',bullet_Sample.velocity,bullet_Sample.angle,true));
-    }
-    else {
-        lvl2_shot.play();
-        bullet_Sample.setAngle(x,y);
-        bullet_Sample.setVelocity();
-        bullets.push(new Bullet(player.x,player.y,5,'green',bullet_Sample.velocity,bullet_Sample.angle,true));
-        bullet_Sample.setAngle(x,y-20);
-        bullet_Sample.setVelocity();
-        bullets.push(new Bullet(player.x,player.y,5,'green',bullet_Sample.velocity,bullet_Sample.angle,true));
-        bullet_Sample.setAngle(x,y+20);
-        bullet_Sample.setVelocity();
-        bullets.push(new Bullet(player.x,player.y,5,'green',bullet_Sample.velocity,bullet_Sample.angle,true));
-    }
-
-    player.shootingStatus = false;
-});
 function animate() {
     animateId = requestAnimationFrame(animate);
 
@@ -117,8 +101,10 @@ function animate() {
                 player.status = false;
                 cancelAnimationFrame(animateId);
                 endGame.play();
-
-
+                finalScore = score;
+                document.getElementById('bigscorepoint').innerHTML = score;
+                menu.style.display = 'flex';
+                board.style.display = 'none';
             }
         }
         bullets.forEach((bullet, bulletIndex) => {
@@ -187,8 +173,47 @@ function createSpellBox() {
         spell_Sample.setColorSpell();
         spell_Sample.setSpell();
         spells.push(new Spells(spell_Sample.x,spell_Sample.y,10,spell_Sample.type,spell_Sample.color,true));
-    },1000);
+    },30000);
 }
-animate();
-createEnemy();
-createSpellBox();
+function startGame() {
+    window.addEventListener('click',event => {
+        player.shootingStatus = true;
+        let x = event.clientX;
+        let y = event.clientY;
+        if (player.weapon_level <= 0) {
+            lvl0_shot.play();
+            bullet_Sample.setAngle(x,y);
+            bullet_Sample.setVelocity();
+            bullets.push(new Bullet(player.x,player.y,5,'white',bullet_Sample.velocity,bullet_Sample.angle,true));
+        }
+        else if (player.weapon_level===1) {
+            lvl1_shot.play();
+            bullet_Sample.setAngle(x,y-20);
+            bullet_Sample.setVelocity();
+            bullets.push(new Bullet(player.x,player.y,5,'red',bullet_Sample.velocity,bullet_Sample.angle,true));
+            bullet_Sample.setAngle(x,y+20);
+            bullet_Sample.setVelocity();
+            bullets.push(new Bullet(player.x,player.y,5,'red',bullet_Sample.velocity,bullet_Sample.angle,true));
+        }
+        else {
+            lvl2_shot.play();
+            bullet_Sample.setAngle(x,y);
+            bullet_Sample.setVelocity();
+            bullets.push(new Bullet(player.x,player.y,5,'green',bullet_Sample.velocity,bullet_Sample.angle,true));
+            bullet_Sample.setAngle(x,y-20);
+            bullet_Sample.setVelocity();
+            bullets.push(new Bullet(player.x,player.y,5,'green',bullet_Sample.velocity,bullet_Sample.angle,true));
+            bullet_Sample.setAngle(x,y+20);
+            bullet_Sample.setVelocity();
+            bullets.push(new Bullet(player.x,player.y,5,'green',bullet_Sample.velocity,bullet_Sample.angle,true));
+        }
+
+        player.shootingStatus = false;
+    });
+    reset();
+    animate();
+    createEnemy();
+    createSpellBox();
+    menu.style.display = 'none';
+    board.style.display = 'inline';
+}

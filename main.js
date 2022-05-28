@@ -119,7 +119,6 @@ function animate() {
             explosion.play();
             enemies.splice(index, 1);
             player.decreateShield();
-            endGame2.play();
             //End Game
             if (player.shield < 0) {
                 player.shield = savedShield;
@@ -133,6 +132,9 @@ function animate() {
                 document.getElementById('bigscorepoint').innerHTML = score;
                 menu.style.display = 'flex';
                 board.style.display = 'none';
+            }
+            else {
+                endGame2.play();
             }
         }
         //Kiểm tra đạn bắn trúng Enemy

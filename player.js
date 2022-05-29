@@ -46,8 +46,6 @@ class Players {
         c.fillStyle = this.color;
         c.fill();
         c.closePath();
-
-
     }
 
     getWeaponLevel() {
@@ -93,30 +91,30 @@ class Players {
     }
 
     keyDown = (event) => {
-        if (event.code === 'ArrowUp') {
+        if (event.key === 'w') {
             this.upPressed = true;
         }
-        if (event.code === 'ArrowDown') {
+        if (event.key === 's') {
             this.downPressed = true;
         }
-        if (event.code === 'ArrowRight') {
+        if (event.key === 'd') {
             this.rightPressed = true;
         }
-        if (event.code === 'ArrowLeft') {
+        if (event.key === 'a') {
             this.leftPressed = true;
         }
     }
     keyUp = (event) => {
-        if (event.code === 'ArrowUp') {
+        if (event.key === 'w') {
             this.upPressed = false;
         }
-        if (event.code === 'ArrowDown') {
+        if (event.key === 's') {
             this.downPressed = false;
         }
-        if (event.code === 'ArrowRight') {
+        if (event.key === 'd') {
             this.rightPressed = false;
         }
-        if (event.code === 'ArrowLeft') {
+        if (event.key === 'a') {
             this.leftPressed = false;
         }
     }
